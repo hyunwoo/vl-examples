@@ -1,106 +1,60 @@
 import { Vue, Component } from 'vue-property-decorator';
 import * as THREE from 'three';
 import VL from '@/vl';
-import InstanceGroup from '@/vl/group/instance/instanceGroup';
 import { isUndefined } from 'util';
 import { CircleBufferGeometry, Vector3 } from 'three';
+import LineSegementGroup from '@/vl/group/lineSegement/lineSegementGroup';
+import RectangleGroup from '@/vl/group/rectangle/rectangleGroup';
 
 
 
 @Component({})
 export default class Main extends Vue {
   public $refs!: { renderer: HTMLElement };
+
+  private vl!: VL;
+  private lineGroup!: LineSegementGroup;
+  private rectGroup!: RectangleGroup;
   private created() {
     console.log('created');
   }
+
   private mounted() {
-    const vl = new VL(this.$refs.renderer);
+    this.vl = new VL(this.$refs.renderer);
     // vl.addObject();
-    vl.scene.background = new THREE.Color('#000');
+    this.vl.setBackgroundColor(0, 0, 0);
     // const bg = vl.createInstanceGroup(new CircleBufferGeometry(100, 2), 10);
-    const count = 1000;
+    const count = 100;
     const igCount = 100;
 
-    const ig = vl.createInstanceGroup(
-      new THREE.CircleBufferGeometry(3, 3),
-      igCount);
 
+    this.lineGroup = this.vl.createGroup(LineSegementGroup, 10);
+    this.rectGroup = this.vl.createRectangleGroup(10);
 
-    const lg = vl.createLineGroup(count);
-    const lines = lg.objects;
-    lines[0].setWidth(50, 20)
-      .setPosition(0, 0, 200, 200)
-      .setColorHEX('#f0f');
+    const line = this.lineGroup.objects[0];
+    const rects = this.rectGroup.objects;
+    // rects[0].setColor(1, 0, 0, 1);
+    const rect = rects[0];
+    rect.y = 100;
+    rect.x = 50;
+    for (let i = 0; i < 10; i++) {
+      const l = this.lineGroup.objects[i];
+      l.setPosition(0, 0, Math.random() * 800 - 400, Math.random() * 800 - 400)
+        .setColor(1, 1, 1, 1);
 
-
-
-    const points: THREE.Vector3[] = [];
-
-    for (let i = 0; i < igCount; i++) {
-      points.push(new Vector3(
-        Math.random() * 1000 - 500,
-        Math.random() * 1000 - 500, 0));
     }
 
-    for (let i = 0; i < igCount; i++) {
-      ig.transpose(i, points[i]);
-    }
+    rect.width = 900;
+    rect.height = 300;
 
-    for (let i = 0; i < count; i++) {
-      const d1 = points[Math.floor(Math.random() * igCount)];
-      const d2 = points[Math.floor(Math.random() * igCount)];
-      lines[i].setColor(1, 1, 0, Math.random() * 0.2)
-        .setPosition(d1.x, d1.y, d2.x, d2.y)
-        .setWidth(1, 1);
-    }
+    rect.setColor(1, 1, 0, 1);
 
+    this.vl.onUpdate = this.onUpdate;
 
-    console.log(lg);
+  }
+  private onUpdate() {
 
-    // bg.transpose(0, 200, 0, 0);
-    // bg.transpose(1, 200, 100, 0);
-    // bg.transpose(2, 200, 200, 0);
-    // bg.size(0, 1, 1, 1);
-
-
-
-
-
-
-
-
-
-    // const size = 10;
-    // const ig = vl.createInstanceGroup(
-    //   new THREE.CircleBufferGeometry(20, 4), size);
-
-
-
-    // for (let i = 0; i < size; i++) {
-    //   ig.translate(i, Math.random() * vl.width - vl.width / 2,
-    //     Math.random() * vl.height - vl.height / 2, 0);
-    //   ig.color(i, new THREE.Color().setRGB(Math.random(), Math.random(), Math.random()),
-    //     0);
-    //   // ig.rotate(i, 0, 0, tick);
-
-    //   // ig.size(i, 0.5, 0.5);
-    // }
-
-    // let tick = 0;
-    // setInterval(() => {
-    //   ig.setAnimtaion(true, 0.1);
-    //   for (let i = 0; i < size; i++) {
-    //     ig.translate(i, Math.random() * vl.width - vl.width / 2,
-    //       Math.random() * vl.height - vl.height / 2, 0);
-    //     ig.color(i, new THREE.Color().setRGB(Math.random(), Math.random(), Math.random()),
-    //       0.2 + Math.random() * 0.5);
-    //     // ig.rotate(i, 0, 0, tick);
-    //     tick += Math.random() * 20;
-    //     // ig.size(i, Math.random(), Math.random());
-    //   }
-
-    // }, 1000);
-
+    // this.rectGroup.intersects(this.vl.mouse.clientX, this.vl.mouse.clientY);
   }
   private destroyed() {
     console.log('destroyed');
