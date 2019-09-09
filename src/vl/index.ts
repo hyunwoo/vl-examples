@@ -8,6 +8,8 @@ import LineSegementGroup from './group/lineSegement/lineSegementGroup';
 import RenderGroup from './group/base/renderGroup';
 import RectangleGroup from './group/rectangle/rectangleGroup';
 import debounce from 'lodash/debounce';
+import InstanceGroup from './group/instance/instanceGroup';
+import InstancePlaneGroup from './group/instance/instancePlaneGroup';
 
 
 /**
@@ -125,7 +127,24 @@ class VL {
       .setCollisionProperties(this.camera, this.width, this.height);
     this.renderGroups.push(group);
     return group;
-
+  }
+  public createPlaneInstanceGroup(
+    meshCount: number,
+    radius: number,
+    segements: number) {
+    const group = new InstancePlaneGroup(this.scene, meshCount, radius, segements)
+      .setCollisionProperties(this.camera, this.width, this.height);
+    this.renderGroups.push(group);
+    return group;
+  }
+  public createInstanceGroup<G extends InstanceGroup>(
+    type: new (scene: THREE.Scene, count: number) => G,
+    count: number,
+  ) {
+    const group = new type(this.scene, count)
+      .setCollisionProperties(this.camera, this.width, this.height);
+    this.renderGroups.push(group);
+    return group;
   }
 
   public createLineSegementGroup(count: number) {

@@ -44,7 +44,7 @@ export default class RectangleGroup
       depthTest: false
     });
 
-    this.initialize(count, 4)
+    this.initializeAttributes(count, 4)
       .setIndex([0, 1, 3, 1, 2, 3])
       .addShaderProperties({
         vertexShader: vs,

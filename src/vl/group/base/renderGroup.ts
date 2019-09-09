@@ -253,17 +253,21 @@ export default abstract class RenderGroup<
    * @param generateCount 최대 생성할 도형의 개수
    * @param unitVertCount 한 도형 당 존재하는 정점의 개수
    */
-  protected initialize(generateCount: number, unitVertCount: number) {
+  protected initializeAttributes(
+    generateCount: number,
+    unitVertCount: number,
+    attributeType?: new (array: ArrayLike<number>, itemSize: number) => THREE.BufferAttribute) {
     this.generateCount = generateCount;
     this.unitVertCount = unitVertCount;
     for (const key of this.propertyKeys) {
       // @ts-ignore readonly 이지만 초기화 하기위한 방법이 마땅하지 않음.
       this.props[key] = new Float32Array(this.unit[key] * generateCount * unitVertCount);
     }
+    attributeType = attributeType ? attributeType : THREE.BufferAttribute;
 
     for (const key of this.propertyKeys) {
       // @ts-ignore readonly 이지만 초기화 하기위한 방법이 마땅하지 않음.
-      this.attr[key] = new THREE.BufferAttribute(this.props[key], this.unit[key]);
+      this.attr[key] = new attributeType(this.props[key], this.unit[key]);
       this.attr[key].name = key as string;
       this.geometry.addAttribute(key as string, this.attr[key]);
       this.attr[key].needsUpdate = true;

@@ -42,7 +42,7 @@ export default class LineSegementGroup
       depthTest: false
     });
 
-    this.initialize(count, 2);
+    this.initializeAttributes(count, 2);
     this.applyMaterial(material);
     this.createObjects(LineSegementObject);
     this.props.color.fill(1);

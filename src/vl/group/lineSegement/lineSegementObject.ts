@@ -18,7 +18,7 @@ export default class LineSegementObject
     super(parent, unit, props, index, unitVertCount);
   }
 
-  public setColor(r: number, g: number, b: number, a?: number) {
+  public color(r: number, g: number, b: number, a?: number) {
     a = (a !== undefined) ? a : 1;
     this.setPropertyValues('color', [
       r, g, b, a,
@@ -26,18 +26,20 @@ export default class LineSegementObject
     ]);
     return this;
   }
-  public setColorHSL(h: number, s: number, l: number, a?: number) {
+  public colorHSL(h: number, s: number, l: number, a?: number) {
     const c = new THREE.Color().setHSL(h, s, l);
-    return this.setColor(c.r, c.g, c.b, a);
+    return this.color(c.r, c.g, c.b, a);
   }
-  public setColorHEX(hex: string, a?: number) {
+  public colorHEX(hex: string, a?: number) {
     const c = new THREE.Color(hex);
-    return this.setColor(c.r, c.g, c.b, a);
+    return this.color(c.r, c.g, c.b, a);
   }
 
-  public setPosition(x1: number, y1: number, x2: number, y2: number): this;
-  public setPosition(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): this;
-  public setPosition(
+
+
+  public position(x1: number, y1: number, x2: number, y2: number): this;
+  public position(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): this;
+  public position(
     x1: number,
     y1: number,
     z1: number,
@@ -82,6 +84,16 @@ export default class LineSegementObject
     }
 
     this.deltaPropertyValues('position', val);
+    return this;
+  }
+
+  // close function
+  private size() {
+    return this;
+  }
+
+  // close function
+  private rotate() {
     return this;
   }
 }

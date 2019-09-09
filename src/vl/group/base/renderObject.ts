@@ -3,7 +3,7 @@ import helper from '@/vl/helper';
 
 
 
-export default class RenderObject<P extends ShapeProperties> {
+export default abstract class RenderObject<P extends ShapeProperties> {
   public readonly index: number;
   public readonly parent: RenderGroup<P, this>;
   public readonly props: RenderProperties<P>;
@@ -63,6 +63,28 @@ export default class RenderObject<P extends ShapeProperties> {
     }
 
     this.checkCollision();
+  }
+
+  public move(...any: number[]): this {
+    return this;
+  }
+  public position(...any: number[]): this {
+    return this;
+  }
+  public rotate(...any: number[]): this {
+    return this;
+  }
+  public size(...any: number[]): this {
+    return this;
+  }
+  public color(...any: number[]): this {
+    return this;
+  }
+  public colorHSL(...any: number[]): this {
+    return this;
+  }
+  public colorHEX(...any: any): this {
+    return this;
   }
 
 
