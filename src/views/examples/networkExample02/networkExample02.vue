@@ -10,9 +10,9 @@
   </v-container>
 
 </template>
-<script src='./pointExample.ts'></script>
+<script src='./networkExample02.ts'></script>
 <style lang='scss'>
-@import './pointExample.scss';
+@import './networkExample02.scss';
 .renderer {
   width: 100%;
   min-height: 600px;

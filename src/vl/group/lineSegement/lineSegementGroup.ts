@@ -21,7 +21,7 @@ export default class LineSegementGroup
   public constructor(scene: THREE.Scene, count: number) {
     super(scene, LineDefinition,
       THREE.BufferGeometry,
-      THREE.Line);
+      THREE.LineSegments);
 
     const material = new THREE.RawShaderMaterial({
       uniforms: {

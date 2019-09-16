@@ -49,11 +49,11 @@ export default class Main extends Vue {
       object.position = {
         0: {
           x,
-          y: -height * 200,
+          y: -height * 200 - 5,
         },
         1: {
           x,
-          y: height * 200,
+          y: height * 200 + 5,
         }
       };
 

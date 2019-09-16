@@ -51,7 +51,7 @@ export default abstract class RenderObject<P extends ShapeVertexProperties> {
         this.props[prop],
         this.reservedProps[prop],
         this.propertyOffsets[prop],
-        0.1
+        1
       );
       if (dist > 0.01) {
         complete = false;

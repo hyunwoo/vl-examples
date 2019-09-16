@@ -50,6 +50,26 @@
             <v-list-item-title>LineExample02</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-divider></v-divider>
+        <v-list-item link
+                     to="/examples/network01">
+          <v-list-item-icon>
+            <v-icon>scatter_plot</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Network Example 01</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link
+                     to="/examples/network02">
+          <v-list-item-icon>
+            <v-icon>scatter_plot</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Network Example 02</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 

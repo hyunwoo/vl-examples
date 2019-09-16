@@ -14,6 +14,7 @@ import {
   ColorHexValues,
   PositionValue,
   ColorValue,
+  ThreeDimensionValue,
 } from '../../dimensionValues';
 import helper from '@/vl/helper';
 import RenderObject from './renderObject';
@@ -56,6 +57,9 @@ export default abstract class RenderObjectMultiVertex<P extends ShapeVertexPrope
     this.position = arg;
     return this;
   }
+  public getPositions() {
+    return this.position as { [key: number]: ThreeDimensionValue; };
+  }
 
 
   public get color(): ColorValues {
@@ -93,7 +97,7 @@ export default abstract class RenderObjectMultiVertex<P extends ShapeVertexPrope
     }
     const c = helper.Util.toColorHSLValuesAsColorValues(arg,
       this.reservedProps.color,
-      this.unitVertCount * 4);
+      this.unitVertCount);
     this.color = c;
   }
   public setColorHSL(arg: ColorHSLValues): this {
@@ -102,27 +106,27 @@ export default abstract class RenderObjectMultiVertex<P extends ShapeVertexPrope
     }
     const c = helper.Util.toColorHSLValuesAsColorValues(arg,
       this.reservedProps.color,
-      this.unitVertCount * 4);
+      this.unitVertCount);
     this.color = c;
     return this;
   }
 
   public set colorHex(arg: ColorHexValues) {
-    if (this.reservedProps.size === undefined) {
+    if (this.reservedProps.color === undefined) {
       throw new Error('오브젝트에 color 속성이 없습니다.');
     }
     const c = helper.Util.toColorHexValuesAsColorValues(arg,
       this.reservedProps.color,
-      this.unitVertCount * 4);
+      this.unitVertCount);
     this.color = c;
   }
   public setColorHex(arg: ColorHexValues): this {
-    if (this.reservedProps.size === undefined) {
+    if (this.reservedProps.color === undefined) {
       throw new Error('오브젝트에 color 속성이 없습니다.');
     }
     const c = helper.Util.toColorHexValuesAsColorValues(arg,
       this.reservedProps.color,
-      this.unitVertCount * 4);
+      this.unitVertCount);
     this.color = c;
     return this;
   }

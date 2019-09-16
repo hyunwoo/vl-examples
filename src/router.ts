@@ -24,9 +24,19 @@ export default new Router({
       component: () => import('@/views/examples/lineExample02'),
     },
     {
+      path: '/examples/network01',
+      name: 'examples-network-01',
+      component: () => import('@/views/examples/networkExample01'),
+    },
+    {
+      path: '/examples/network02',
+      name: 'examples-network-01',
+      component: () => import('@/views/examples/networkExample02'),
+    },
+    {
       path: '/examples/points01',
       name: 'examples-points-01',
-      component: () => import('@/views/examples/pointExample'),
+      component: () => import('@/views/examples/networkExample01'),
     },
     // {
     //   path: '/about',

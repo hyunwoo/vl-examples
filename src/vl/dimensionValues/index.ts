@@ -36,6 +36,14 @@ interface FourDimensionValue extends DimensionValue {
   w: number;
 }
 
+export {
+  ThreeDimensionValue,
+  FourDimensionValue,
+  DimensionColorHexValue,
+  DimensionColorHSLValue,
+  DimensionColorValue,
+};
+
 export type PositionValue = Partial<ThreeDimensionValue>;
 export type RotationValue = ThreeDimensionValue;
 export type SizeValue = Partial<ThreeDimensionValue>;
