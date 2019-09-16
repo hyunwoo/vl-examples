@@ -13,6 +13,21 @@ export default new Router({
       name: 'main',
       component: Main,
     },
+    {
+      path: '/examples/line01',
+      name: 'examples-line-01',
+      component: () => import('@/views/examples/lineExample01'),
+    },
+    {
+      path: '/examples/line02',
+      name: 'examples-line-02',
+      component: () => import('@/views/examples/lineExample02'),
+    },
+    {
+      path: '/examples/points01',
+      name: 'examples-points-01',
+      component: () => import('@/views/examples/pointExample'),
+    },
     // {
     //   path: '/about',
     //   name: 'about',

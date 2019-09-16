@@ -17,18 +17,39 @@
     <v-navigation-drawer v-model="drawer"
                          app
                          dark>
-      <v-list dense>
-        <v-list-item>
-          <v-list-item-action>
-            <v-icon>close</v-icon>
-          </v-list-item-action>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title class="title">
+            VL
+          </v-list-item-title>
+          <!-- <v-list-item-subtitle>
+            subtext
+          </v-list-item-subtitle> -->
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list dense
+              nav>
+        <v-list-item link
+                     to="/examples/line01">
+          <v-list-item-icon>
+            <v-icon>sort</v-icon>
+          </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title class="grey--text">
-              asdf
-            </v-list-item-title>
+            <v-list-item-title>LineExample01</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-
+        <v-list-item link
+                     to="/examples/line02">
+          <v-list-item-icon>
+            <v-icon>sort</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>LineExample02</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
