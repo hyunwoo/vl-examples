@@ -1,6 +1,7 @@
 <template>
   <v-app dark>
-    <v-app-bar app
+
+    <!-- <v-app-bar app
                floating=""
                dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
@@ -12,9 +13,9 @@
              target="_blank">
         <span class="mr-2">h.hyunwoo</span>
       </v-btn>
-    </v-app-bar>
+    </v-app-bar> -->
 
-    <v-navigation-drawer v-model="drawer"
+    <!-- <v-navigation-drawer v-model="drawer"
                          app
                          dark>
       <v-list-item>
@@ -22,9 +23,6 @@
           <v-list-item-title class="title">
             VL
           </v-list-item-title>
-          <!-- <v-list-item-subtitle>
-            subtext
-          </v-list-item-subtitle> -->
         </v-list-item-content>
       </v-list-item>
 
@@ -71,12 +69,31 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
 
     <v-content>
-
+      <div class="app-bar">
+        <div class="side-bar left">
+          <v-btn icon
+                 large
+                 float><i class="fab fa-npm"></i></v-btn>
+          <v-btn icon
+                 large
+                 float><i class="fab fa-github"></i></v-btn>
+        </div>
+        <div class="top-bar">
+          <div class="site-name">VIRE</div>
+          <div class="flex-fill"></div>
+          <div class="site-menu">Examples</div>
+          <div class="site-menu">Documents</div>
+          <div class="site-menu">Showcase</div>
+        </div>
+      </div>
       <router-view></router-view>
     </v-content>
   </v-app>
 </template>
 <script src="./app.ts"></script>
+<style lang="scss">
+@import './app.scss';
+</style>

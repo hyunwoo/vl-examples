@@ -1,7 +1,9 @@
 <template >
   <v-container fluid=""
                dark
+               fill-height
                pa-0>
+
     <v-layout>
 
     </v-layout>
@@ -15,8 +17,7 @@
 @import './main.scss';
 .renderer {
   width: 100%;
-  min-height: 600px;
-  height: calc(100vh - 64px);
+  height: 100%;
   canvas {
     width: 100%;
     height: 100%;

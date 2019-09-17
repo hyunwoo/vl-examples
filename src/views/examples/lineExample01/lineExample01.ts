@@ -1,24 +1,24 @@
 import { Vue, Component } from 'vue-property-decorator';
 import * as THREE from 'three';
-import VL from '@/vl';
+import VIRE from '@/vire';
 import { isUndefined } from 'util';
 import { CircleBufferGeometry, Vector3 } from 'three';
-import LineSegementGroup from '@/vl/group/lineSegement/lineSegementGroup';
-import RectangleGroup from '@/vl/group/rectangle/rectangleGroup';
-import InstanceGroup from '@/vl/group/instance/instanceGroup';
+import LineSegementGroup from '@/vire/group/lineSegement/lineSegementGroup';
+import RectangleGroup from '@/vire/group/rectangle/rectangleGroup';
+import InstanceGroup from '@/vire/group/instance/instanceGroup';
 
 
 
 @Component({})
 export default class Main extends Vue {
   public $refs!: { renderer: HTMLElement };
-  private vl!: VL;
+  private vl!: VIRE;
   private lineGroup!: LineSegementGroup;
   private lineCount: number = 720;
 
 
   private mounted() {
-    this.vl = new VL(this.$refs.renderer);
+    this.vl = new VIRE(this.$refs.renderer);
     console.log('create stats');
     this.vl.appendStats({
       position: 'absolute',

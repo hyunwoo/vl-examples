@@ -1,18 +1,18 @@
 import { Vue, Component } from 'vue-property-decorator';
-import VL from '@/vl';
-import LineSegementGroup from '@/vl/group/lineSegement/lineSegementGroup';
+import VIRE from '@/vire';
+import LineSegementGroup from '@/vire/group/lineSegement/lineSegementGroup';
 
 
 
 @Component({})
 export default class Main extends Vue {
   public $refs!: { renderer: HTMLElement };
-  private vl!: VL;
+  private vl!: VIRE;
   private lineGroup!: LineSegementGroup;
   private lineCount!: number;
 
   private mounted() {
-    this.vl = new VL(this.$refs.renderer);
+    this.vl = new VIRE(this.$refs.renderer);
     this.lineCount = this.vl.width / 2 - 20;
     console.log('create stats');
     this.vl.appendStats({

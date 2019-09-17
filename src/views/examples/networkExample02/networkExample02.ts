@@ -1,9 +1,9 @@
 import { Vue, Component } from 'vue-property-decorator';
-import VL from '@/vl';
-import { PointGroup } from '@/vl/group/point';
+import VIRE from '@/vire';
+import { PointGroup } from '@/vire/group/point';
 import * as THREE from 'three';
-import LineSegementGroup from '@/vl/group/lineSegement/lineSegementGroup';
-import { ThreeDimensionValue } from '@/vl/dimensionValues';
+import LineSegementGroup from '@/vire/group/lineSegement/lineSegementGroup';
+import { ThreeDimensionValue } from '@/vire/dimensionValues';
 
 
 interface Movement {
@@ -24,7 +24,7 @@ interface NodeLinker {
 @Component({})
 export default class Main extends Vue {
   public $refs!: { renderer: HTMLElement };
-  private vl!: VL;
+  private vl!: VIRE;
   private pointGroup!: PointGroup;
   private lineGroup!: LineSegementGroup;
   private pointCount: number = 1000;
@@ -34,7 +34,7 @@ export default class Main extends Vue {
 
 
   private mounted() {
-    this.vl = new VL(this.$refs.renderer);
+    this.vl = new VIRE(this.$refs.renderer);
     console.log('create stats');
     this.vl.appendStats({
       position: 'absolute',
