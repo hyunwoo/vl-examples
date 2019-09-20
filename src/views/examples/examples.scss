@@ -1,0 +1,16 @@
+// file created at 2019-9-18
+// Auto-generated files examples.scss
+
+$examples-list-width: 280px;
+
+.examples-list-container {
+  min-width: $examples-list-width;
+  max-width: $examples-list-width;
+  border-right: solid 1px rgba(255, 255, 255, 0.1);
+  background: #222;
+  height: 100%;
+
+  .v-list {
+    background: inherit;
+  }
+}

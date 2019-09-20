@@ -3,6 +3,5 @@
   "trailing-comma": false,
   "no-submodule-imports": false,
   "no-console": false,
-  "no-implicit-dependencies": false,
-  "arrowParens": "always"
+  "no-implicit-dependencies": false
 }

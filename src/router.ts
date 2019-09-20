@@ -14,29 +14,66 @@ export default new Router({
       component: Main,
     },
     {
-      path: '/examples/line01',
-      name: 'examples-line-01',
-      component: () => import('@/views/examples/lineExample01'),
+      path: '/showcase',
+      name: 'Showcase',
+      component: () => import('@/views/showcase'),
     },
     {
-      path: '/examples/line02',
+      path: '/examples',
+      name: 'Examples',
+      component: () => import('@/views/examples'),
+    },
+    {
+      path: '/examples/line/radial-light',
+      name: 'examples-line-01',
+      component: () => import('@/views/examples/line/radialLight'),
+    },
+    {
+      path: '/examples/line/waveform',
       name: 'examples-line-02',
-      component: () => import('@/views/examples/lineExample02'),
+      component: () => import('@/views/examples/line/waveform'),
     },
     {
       path: '/examples/network01',
       name: 'examples-network-01',
-      component: () => import('@/views/examples/networkExample01'),
+      component: () => import('@/views/examples/network/networkExample01'),
     },
     {
       path: '/examples/network02',
-      name: 'examples-network-01',
-      component: () => import('@/views/examples/networkExample02'),
+      name: 'examples-network-02',
+      component: () => import('@/views/examples/network/networkExample02'),
     },
     {
       path: '/examples/points01',
       name: 'examples-points-01',
-      component: () => import('@/views/examples/networkExample01'),
+      component: () => import('@/views/examples/network/networkExample01'),
+    },
+    // Samples
+    {
+      path: '/examples/sample/line-with-point-movement-01',
+      name: 'line-with-point-movement-01',
+      component: () => import('@/views/examples/sample/lineWithPointMovement01'),
+    },
+    {
+      path: '/examples/sample/line-with-point-movement-02',
+      name: 'line-with-point-movement-02',
+      component: () => import('@/views/examples/sample/lineWithPointMovement02'),
+    },
+    {
+      path: '/examples/sample/line-with-point-movement-03',
+      name: 'line-with-point-movement-03',
+      component: () => import('@/views/examples/sample/lineWithPointMovement03'),
+    },
+    {
+      path: '/examples/sample/line-with-point-movement-04',
+      name: 'line-with-point-movement-04',
+      component: () => import('@/views/examples/sample/lineWithPointMovement04'),
+    },
+
+    {
+      path: '/workspace/tsne-viewer',
+      name: 'tsne-viewer',
+      component: () => import('@/views/workspace/tsneViewer'),
     },
     // {
     //   path: '/about',

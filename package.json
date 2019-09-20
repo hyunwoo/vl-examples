@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-modern": "vue-cli-service build --modern"
+    "build-modern": "vue-cli-service build --modern",
+    "pre-publish": "node ./pre-publish"
   },
   "dependencies": {
     "@koa/cors": "^3.0.0",
@@ -16,6 +17,7 @@
     "koa-send": "^5.0.0",
     "koa-static": "^5.0.0",
     "register-service-worker": "^1.6.2",
+    "tsne-js": "^1.0.3",
     "uuid": "^3.3.3",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
@@ -35,6 +37,7 @@
     "@vue/cli-plugin-typescript": "^3.10.0",
     "@vue/cli-service": "^3.10.0",
     "firebase": "^6.4.0",
+    "koa-compress": "^3.0.0",
     "lint-staged": "^8.1.5",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
@@ -47,7 +50,8 @@
     "vue-cli-plugin-vuetify": "^0.6.3",
     "vue-template-compiler": "^2.6.10",
     "vuetify-loader": "^1.2.2",
-    "vuex-router-sync": "^5.0.0"
+    "vuex-router-sync": "^5.0.0",
+    "worker-loader": "^2.0.0"
   },
   "postcss": {
     "plugins": {

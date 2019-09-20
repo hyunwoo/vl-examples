@@ -28,30 +28,15 @@ export default class Main extends Vue {
   private vl!: VIRE;
   private pointGroup!: PointGroup;
   private lineGroup!: LineSegementGroup;
-  private pointCount: number = 100;
+  private pointCount: number = 60;
   private pointMovements: Movement[] = [];
   private nodeLinker: NodeLinker[] = [];
   private lineCount!: number;
   private moveStatus: number = 0;
 
-  @Watch('moveStatus')
-  private onChangeStyle() {
-
-    console.log('change', this.moveStatus);
-    // switch (this.moveStatus) {
-    //   case 0:
-    //     this.alignRectangle();
-    //     break;
-    //   case 1:
-    //     this.alignEllipse();
-    //     break;
-    //   case 2:
-    //     this.alignInnerEllipse();
-    //     break;
-    // }
-  }
   private mounted() {
     this.vl = new VIRE(this.$refs.renderer);
+
 
 
     for (let i = 0; i < this.pointCount; i++) {
@@ -86,12 +71,12 @@ export default class Main extends Vue {
     this.alignTwist(0);
 
     this.lineGroup.objects.forEach((object, index) => {
-      const fromPos = this.pointGroup.objects[this.nodeLinker[index].from].getPositions();
-      const toPos = this.pointGroup.objects[this.nodeLinker[index].to].getPositions();
+      const fromPos = this.pointGroup.objects[this.nodeLinker[index].from].getPosition();
+      const toPos = this.pointGroup.objects[this.nodeLinker[index].to].getPosition();
 
       object.position = {
-        0: fromPos[0],
-        1: toPos[0],
+        0: fromPos,
+        1: toPos,
       };
       object.colorHex = {
         0: {
@@ -116,7 +101,8 @@ export default class Main extends Vue {
 
     switch (this.moveStatus) {
       case 0:
-        this.alignRectangle(time);
+        // this.alignTwist(time);
+        this.alignWaveform(time);
         break;
       case 1:
         this.alignEllipse(time);
@@ -128,68 +114,32 @@ export default class Main extends Vue {
         this.alignTwist(time);
         break;
     }
-    // this.pointGroup.objects.forEach((object, index) => {
-
-    //   const movement = this.pointMovements[index];
-    //   const velocity = deltaTime * movement.velocity;
-    //   // object.position = {
-    //   //   0: {
-    //   //     x: object.position[0].x ?
-    //   //       object.position[0].x + movement.direction.x * velocity : 0,
-    //   //     y: object.position[0].y ?
-    //   //       object.position[0].y + movement.direction.y * velocity : 0,
-    //   //   }
-    //   // };
-    //   if (object.position[0].x !== undefined &&
-    //     object.position[0].x < -this.vl.width / 2 &&
-    //     movement.direction.x < 0) {
-    //     movement.direction.x *= -1;
-    //   }
-
-    //   if (object.position[0].x !== undefined &&
-    //     object.position[0].x > this.vl.width / 2 &&
-    //     movement.direction.x > 0) {
-    //     movement.direction.x *= -1;
-    //   }
-
-    //   if (object.position[0].y !== undefined &&
-    //     object.position[0].y < -this.vl.height / 2 &&
-    //     movement.direction.y < 0) {
-    //     movement.direction.y *= -1;
-    //   }
-
-    //   if (object.position[0].y !== undefined &&
-    //     object.position[0].y > this.vl.height / 2 &&
-    //     movement.direction.y > 0) {
-    //     movement.direction.y *= -1;
-    //   }
-    // });
-
     this.lineGroup.objects.forEach((object, index) => {
-      const fromPos = this.pointGroup.objects[this.nodeLinker[index].from].getPositions();
-      const toPos = this.pointGroup.objects[this.nodeLinker[index].to].getPositions();
+      const fromPos = this.pointGroup.objects[this.nodeLinker[index].from].getPosition();
+      const toPos = this.pointGroup.objects[this.nodeLinker[index].to].getPosition();
 
       const dist =
-        Math.sqrt((fromPos[0].x - toPos[0].x) * (fromPos[0].x - toPos[0].x) +
-          (fromPos[0].y - toPos[0].y) * (fromPos[0].y - toPos[0].y) +
-          (fromPos[0].z - toPos[0].z) * (fromPos[0].z - toPos[0].z));
+        Math.sqrt((fromPos.x - toPos.x) * (fromPos.x - toPos.x) +
+          (fromPos.y - toPos.y) * (fromPos.y - toPos.y) +
+          (fromPos.z - toPos.z) * (fromPos.z - toPos.z));
 
 
-      const a = Math.max((this.vl.width / 5 - dist) * 0.01, 0) * 0.6;
+      const a = Math.min(Math.max((this.vl.height / 3 - dist) * 0.01, 0) * 0.5, 1);
 
       object.position = {
-        0: fromPos[0],
-        1: toPos[0],
+        0: fromPos,
+        1: toPos,
       };
+
       object.colorHSL = {
         0: {
-          h: fromPos[0].x / this.vl.width * 0.2 + 0.8 + time * 0.03,
+          h: fromPos.x / this.vl.width * 0.2 + 0.8 + time * 0.03,
           s: 0.9 * a,
           l: 0.6,
           a,
         },
         1: {
-          h: toPos[0].x / this.vl.width * 0.2 + 0.72 + time * 0.03,
+          h: toPos.x / this.vl.width * 0.2 + 0.72 + time * 0.03,
           s: 0.9 * a,
           l: 0.6,
           a
@@ -199,52 +149,74 @@ export default class Main extends Vue {
   }
 
 
+  private alignWaveform(t: number) {
+    const halfCount = Math.floor(this.pointCount / 2);
+    this.pointGroup.objects.forEach((object, index) => {
+      const y = Math.sin(index * 0.1 + t) * 70;
+      object.position = {
+
+        x: -this.vl.width / 2 + this.vl.width / (halfCount - 3) * (index % halfCount),
+        y: index < halfCount ? -100 - y : 100 - y,
+        z: 0,
+
+      };
+      object.colorHSL = {
+
+        h: 1,
+        s: 1,
+        l: 1,
+        a: 0.4,
+
+      };
+      object.update();
+    });
+  }
   private alignRectangle(t: number) {
     const sqrtCount = Math.floor(Math.sqrt(this.pointCount));
     const gridX = this.vl.width / sqrtCount + 10;
     this.pointGroup.objects.forEach((object, index) => {
 
       object.position = {
-        0: {
-          x: index % sqrtCount * gridX - this.vl.width / 2 + Math.sin(t + index * 0.1) * 10,
-          y: Math.floor(index / sqrtCount) * gridX - this.vl.height / 2 + Math.sin(t + index * 0.1) * 10,
-          z: 0,
-        }
+
+        x: index % sqrtCount * gridX - this.vl.width / 2 + Math.sin(t + index * 0.1) * 10,
+        y: Math.floor(index / sqrtCount) * gridX - this.vl.height / 2 + Math.sin(t + index * 0.1) * 10,
+        z: 0,
+
       };
       object.colorHSL = {
-        0: {
-          h: 1,
-          s: 1,
-          l: 1,
-          a: 0.4,
-        }
+
+        h: 1,
+        s: 1,
+        l: 1,
+        a: 0.4,
+
       };
       object.update();
     });
   }
 
   private alignTwist(t: number) {
-    const stepCount = 3;
+    const stepCount = 2;
     const stepInner = Math.floor(this.pointGroup.objects.length / stepCount);
     this.pointGroup.objects.forEach((object, index) => {
       const angle = index * stepCount / this.pointCount * Math.PI * 2;
-      const r = this.vl.width / 2 * index / stepInner / 3 +
-        index % 2 * 40 + Math.sin(t + index * 0.1) * 40;
+      const r = this.vl.height * index / stepInner / 3 +
+        index % 2 * 40 + Math.sin(t + index * 0.13) * 60;
 
       object.position = {
-        0: {
-          x: Math.sin(angle) * r,
-          y: Math.cos(angle) * r,
-          z: 0,
-        }
+
+        x: Math.sin(angle) * r,
+        y: Math.cos(angle) * r,
+        z: 0,
+
       };
       object.colorHSL = {
-        0: {
-          h: 1,
-          s: 1,
-          l: 1,
-          a: 0.4,
-        }
+
+        h: 1,
+        s: 1,
+        l: 1,
+        a: 0.4,
+
       };
       object.update();
     });
@@ -256,22 +228,22 @@ export default class Main extends Vue {
     this.pointGroup.objects.forEach((object, index) => {
       const angle = index * stepCount / this.pointCount * Math.PI * 2;
       const stepIndex = Math.floor(index / stepInner);
-      const r = this.vl.width / 3 * Math.floor(index / stepInner) / 5 + index % 2 * 40
-        + Math.sin(t + stepIndex * 0.2) * 40 + 80;
+      const r = this.vl.height / 3 * Math.floor(index / stepInner) / 5 + index % 2 * 40
+        + Math.sin(t + stepIndex * 0.2) * 40 + 120;
       object.position = {
-        0: {
-          x: Math.sin(angle) * r,
-          y: Math.cos(angle) * r,
-          z: 0,
-        }
+
+        x: Math.sin(angle) * r,
+        y: Math.cos(angle) * r,
+        z: 0,
+
       };
       object.colorHSL = {
-        0: {
-          h: 1,
-          s: 1,
-          l: 1,
-          a: 0.4,
-        }
+
+        h: 1,
+        s: 1,
+        l: 1,
+        a: 0.4,
+
       };
       object.update();
     });
@@ -282,22 +254,22 @@ export default class Main extends Vue {
     this.pointGroup.objects.forEach((object, index) => {
       const angle = index / this.pointCount * Math.PI * 2;
       const multiply = index % 2 === 0 ? -1 : 1;
-      const r = this.vl.width / 3 + multiply * 20 +
+      const r = this.vl.height / 3 + multiply * 30 +
         Math.sin(t + Math.PI * 2 * index / length * 2) * multiply * 20;
       object.position = {
-        0: {
-          x: Math.sin(angle) * r,
-          y: Math.cos(angle) * r,
-          z: 0,
-        }
+
+        x: Math.sin(angle) * r,
+        y: Math.cos(angle) * r,
+        z: 0,
+
       };
       object.colorHSL = {
-        0: {
-          h: 1,
-          s: 1,
-          l: 1,
-          a: 0.4,
-        }
+
+        h: 1,
+        s: 1,
+        l: 1,
+        a: 0.4,
+
       };
       object.update();
     });

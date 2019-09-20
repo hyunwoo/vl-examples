@@ -8,6 +8,13 @@ module.exports = {
       symlinks: false
     }
   },
+  chainWebpack: config => {
+    config.module
+      .rule('worker')
+      .test(/\.worker\.js$/)
+      .use('worker-loader')
+      .loader('worker-loader');
+  },
   transpileDependencies: ['vuetify'],
   publicPath: undefined,
   outputDir: undefined,

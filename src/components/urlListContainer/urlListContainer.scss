@@ -1,0 +1,27 @@
+// file created at 2019-9-18
+// Auto-generated files urlListContainer.scss
+
+
+$examples-list-width: 280px;
+
+.examples-list-container {
+  min-width: $examples-list-width;
+  max-width: $examples-list-width;
+  border-right: solid 1px rgba(255, 255, 255, 0.1);
+  background: #222;
+  height: 100%;
+
+  .v-list {
+    margin-top: 8px;
+    background: inherit;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .category-guide {
+    color: #aaa;
+    padding: 0 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
