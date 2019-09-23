@@ -1,7 +1,3 @@
-[submodule "src/vue-common"]
-	path = src/vue-common
-	url = git://github.com/hyunwoo/vue-common.git
-
 [submodule "src/vire"]
 	path = src/vire
 	url = git://github.com/hyunwoo/vire.git

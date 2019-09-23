@@ -11,70 +11,100 @@ export default new Router({
     {
       path: '/',
       name: 'main',
-      component: Main,
+      component: Main
     },
     {
       path: '/showcase',
       name: 'Showcase',
-      component: () => import('@/views/showcase'),
+      component: () => import('@/views/showcase')
     },
     {
       path: '/examples',
       name: 'Examples',
-      component: () => import('@/views/examples'),
+      component: () => import('@/views/examples')
     },
     {
       path: '/examples/line/radial-light',
       name: 'examples-line-01',
-      component: () => import('@/views/examples/line/radialLight'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-line" */ '@/views/examples/line/radialLight'
+        )
     },
     {
       path: '/examples/line/waveform',
       name: 'examples-line-02',
-      component: () => import('@/views/examples/line/waveform'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-line" */ '@/views/examples/line/waveform'
+        )
     },
     {
       path: '/examples/network01',
       name: 'examples-network-01',
-      component: () => import('@/views/examples/network/networkExample01'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-network" */ '@/views/examples/network/networkExample01'
+        )
     },
     {
       path: '/examples/network02',
       name: 'examples-network-02',
-      component: () => import('@/views/examples/network/networkExample02'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-network" */ '@/views/examples/network/networkExample02'
+        )
     },
     {
       path: '/examples/points01',
       name: 'examples-points-01',
-      component: () => import('@/views/examples/network/networkExample01'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-network" */ '@/views/examples/network/networkExample01'
+        )
     },
     // Samples
     {
       path: '/examples/sample/line-with-point-movement-01',
       name: 'line-with-point-movement-01',
-      component: () => import('@/views/examples/sample/lineWithPointMovement01'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-sample" */ '@/views/examples/sample/lineWithPointMovement01'
+        )
     },
     {
       path: '/examples/sample/line-with-point-movement-02',
       name: 'line-with-point-movement-02',
-      component: () => import('@/views/examples/sample/lineWithPointMovement02'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-sample" */ '@/views/examples/sample/lineWithPointMovement02'
+        )
     },
     {
       path: '/examples/sample/line-with-point-movement-03',
       name: 'line-with-point-movement-03',
-      component: () => import('@/views/examples/sample/lineWithPointMovement03'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-sample" */ '@/views/examples/sample/lineWithPointMovement03'
+        )
     },
     {
       path: '/examples/sample/line-with-point-movement-04',
       name: 'line-with-point-movement-04',
-      component: () => import('@/views/examples/sample/lineWithPointMovement04'),
+      component: () =>
+        import(
+          /* webpackChunkName: "example-sample" */ '@/views/examples/sample/lineWithPointMovement04'
+        )
     },
 
     {
       path: '/workspace/tsne-viewer',
       name: 'tsne-viewer',
-      component: () => import('@/views/workspace/tsneViewer'),
-    },
+      component: () =>
+        import(
+          /* webpackChunkName: "workspace-tsne" */ '@/views/workspace/tsneViewer'
+        )
+    }
     // {
     //   path: '/about',
     //   name: 'about',
@@ -83,5 +113,5 @@ export default new Router({
     //   // which is lazy-loaded when the route is visited.
     //   component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
     // },
-  ],
+  ]
 });
