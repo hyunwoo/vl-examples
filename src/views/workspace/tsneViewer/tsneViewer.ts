@@ -5,11 +5,15 @@ import { Vue, Component } from 'vue-property-decorator';
 import VIRE from '@/vire';
 import { PointGroup } from '@/vire/group/point';
 
+import _ from 'lodash';
 import raw from './data/case_edge.json';
 import TSNE from 'tsne-js';
 import caseEdges from './data/case_edge.json';
+import humanEdges from './data/human_edge.json';
+import caseHumanEdges from './data/human_case_edge.json';
 import humans from './data/tsne_human_edge_dim_2.json';
 import cases from './data/tsne_case_edge_dim_2.json';
+// import humanCaseEdges from './data/'
 import { LineSegementGroup } from '@/vire/group/lineSegement';
 import Worker from 'worker-loader!./tsne.worker.ts';
 import { TSNEWorkerProps, TSNEWorkerData } from './index.js';
@@ -29,6 +33,12 @@ export default class TsneViewer extends Vue {
     distributionRadius: 400,
   };
   private ui = {
+    tab: {
+      activate: '',
+    },
+    human: {
+      weight: [0.0, 1.0],
+    },
     tsne: {
       perplexity: 15,
       earlyExaggeration: 2,
@@ -41,13 +51,24 @@ export default class TsneViewer extends Vue {
       currentGVN: '-'
     }
   };
+  private clickControlFieldCommand(key: string) {
+    if (this.ui.tab.activate === key) {
+      this.ui.tab.activate = '';
+    } else {
+      this.ui.tab.activate = key;
+    }
+  }
   private mounted() {
     this.vl = new VIRE(this.$refs.renderer, true);
     this.vl.setBackgroundColor('#fff');
     this.vl.appendGridHelperWithRotate(10000, 100, '#ddd', '#eee', 90);
     // this.vl.appendGridHelperWithRotate(10000, 100, '#ddd', '#eee');
     // this.vl.appendGridHelperWithRotate(10000, 100, '#ccc', '#ddd', 0, 0, 90);
-    this.vl.appendStats();
+    this.vl.appendStats({
+      position: 'absolute',
+      left: 'auto',
+      right: '0px',
+    });
     this.vl.onUpdate = this.rendererUpdate;
 
 
@@ -86,7 +107,14 @@ export default class TsneViewer extends Vue {
       d.setColorHex('#039be5');
     });
 
+    console.warn('case human edge : ', caseHumanEdges.length);
+    console.warn('cases edge : ', cases.length);
+    console.warn('human edge : ', humans.length);
+
+    // console.log(humans.length);
     // return;
+    // setTimeout(this.createHumanGroup, 3000);
+    // this.createHumanGroup();
 
     return;
     this.groupHuman = this.vl.createGroup(PointGroup, 1295);
@@ -141,6 +169,83 @@ export default class TsneViewer extends Vue {
   private rendererUpdate() {
     // this.drawEdges();
   }
+
+  private updateEdgeHumanNode() {
+    // TODO Update
+  }
+
+
+  private createHumanGroup() {
+    if (this.groupHuman !== undefined) {
+      this.vl.removeRenderGroup(this.groupHuman);
+    }
+    this.groupHuman = this.vl.createGroup(PointGroup, humans.length);
+    this.updatePeoplePosition();
+  }
+
+  private updatePeoplePosition() {
+    const humanObjects = this.groupHuman.objects;
+    const caseObjects = this.groupCase.objects;
+    humanObjects.forEach(o => o.scale = 0);
+    const points = {};
+    _(caseHumanEdges).groupBy(h => h.from)
+      .forEach(ws => {
+        // TODO weight position check
+        const ws0 = ws[0];
+        points[ws0.from] = {
+          from: ws0.from,
+          to: ws0.to,
+          position: caseObjects[ws0.to].position,
+          weight: ws0.weight
+        };
+      });
+
+    _.forEach(humanEdges, (humanEdge, i) => {
+      // TODO here weight gap;
+      const pts = _(humanEdge).filter(c => true)
+        .map((c, index) => {
+          if (points[index] === undefined) {
+            return undefined;
+          }
+          return Object.assign(points[index], { value: c });
+        })
+        .filter(c => c !== undefined)
+        .map(c => {
+          return {
+            weight: c.value,
+            position: {
+              x: c.position.x * c.weight,
+              y: c.position.y * c.weight,
+              z: c.position.z * c.weight,
+            }
+          };
+        })
+        .value();
+      const w = _.sumBy(pts, p => p.weight);
+      const x = _.sumBy(pts, p => p.position.x) / w;
+      const y = _.sumBy(pts, p => p.position.y) / w;
+      const z = _.sumBy(pts, p => p.position.z) / w;
+
+      const obj = humanObjects[Number(i)];
+      obj.position = {
+        x,
+        y,
+        z
+      };
+      obj.scale = 2;
+      obj.setColorHex('#f00');
+
+    });
+
+
+
+
+    // objs.forEach((o, i )=>{
+    //   o.po
+    // })
+  }
+
+  // CASES 분석
   private updateCases(arr: number[][]) {
     const groupObjects = this.groupCase.objects;
     for (let i = 0; i < arr.length; i++) {

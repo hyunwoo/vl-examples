@@ -13,24 +13,54 @@
     height: 100%;
   }
 }
+.controls {
+  position : absolute;
+  left : 0px;
+  top : 0px;
+  z-index: 5;
+  height : 100vh;
+  background : #fff;
+  border-right : solid 1px #ddd;
+  width : 48px;
 
-.t-sen-controller {
-  z-index: 4;
-  width: 300px;
-  border: solid 1px #ddd;
-  background: #fff;
-  position: absolute;
-  top: 60px;
-  left: 24px;
-
-  .selector-header {
-    font-size: 12px;
-    padding: 8px 8px 0;
+  .command {
+    background : #fff;
+    transition : background-color 0.3s, color .3s;
+    &[selected] {
+      background : #555;
+      color : #fff;
+    }
+    border-radius: 0 !important;
+    height : 48px;
+    width : 48px;
+    border-bottom: solid 1px #eee;
   }
+  .control-field {
+    opacity : 0;
+    left : 48px;
+    pointer-events: none;
+    transition: opacity .3s, left .3s;
+    z-index : -1;
+    &[selected] {
+      opacity : 1;
+      pointer-events: all;
+      left: 64px;
+    }
+    width: 300px;
+    border: solid 1px #ddd;
+    background: #fff;
+    position: absolute;
+    top: 32px;
+    .selector-header {
+      font-size: 12px;
+      padding: 8px 8px 0;
+    }
 
-  .number-guide {
-    width: 28px;
-    font-size: 14px;
-    color: #666;
+    .number-guide {
+      width: 28px;
+      font-size: 14px;
+      color: #666;
+    }
+
   }
 }
