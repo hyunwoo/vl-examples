@@ -17,6 +17,7 @@ import cases from './data/tsne_case_edge_dim_2.json';
 import { LineSegementGroup } from '@/vire/group/lineSegement';
 import Worker from 'worker-loader!./tsne.worker.ts';
 import { TSNEWorkerProps, TSNEWorkerData } from './index.js';
+import caseRawData from './data/generated/case.json';
 
 @Component({})
 export default class TsneViewer extends Vue {
@@ -58,12 +59,87 @@ export default class TsneViewer extends Vue {
       this.ui.tab.activate = key;
     }
   }
+  private getNodePositionInCell(
+    cellIndex: number,
+    cellMaxCount: number,
+    nodeIndex: number,
+    nodeMaxCount: number
+  ): {
+    x: number,
+    y: number,
+  } {
+    const width = 400;
+    const height = 400;
+    const splitCount = Math.ceil(Math.sqrt(cellMaxCount));
+    const cx = width / splitCount / 2
+      + cellIndex % splitCount * width / splitCount;
+    const cy = height / splitCount / 2 + cellIndex
+      + Math.floor(cellIndex / splitCount) * height / splitCount;
+
+    // 셀의 중점을 기준으로 노드의 위치를 구해야 한다.
+    const nodeSplitCount = Math.ceil(Math.sqrt(nodeMaxCount));
+    const nodeIndexX = nodeIndex % nodeSplitCount - nodeSplitCount / 2;
+    const nodeIndexY = Math.floor(nodeIndex / nodeSplitCount) - nodeSplitCount / 2;
+    const nodeSize = 4;
+
+    return {
+      x: nodeIndexX * nodeSize + cx - width / 2,
+      y: -nodeIndexY * nodeSize + -cy + height / 2,
+    };
+  }
+  private applyNodePosition(category: string) {
+    const caseObjects = this.groupCase.objects;
+    const groups = _.groupBy(caseRawData, d => d[category]);
+    const groupLength = Object.keys(groups).length;
+    _(groups).map((v, k) => {
+      return {
+        name: k,
+        items: v,
+      };
+    }).sortBy(group => -group.items.length).forEach((group, groupIndex) => {
+      // color group.name
+      _.forEach(group.items, (item, itemIndex) => {
+        const pos = this.getNodePositionInCell(groupIndex, groupLength, itemIndex, group.items.length);
+        console.log(pos);
+        const node = caseObjects[item.id - 1];
+        node.position = {
+          x: pos.x,
+          y: pos.y
+        };
+      });
+    });
+
+  }
+  private changeCategorize(name) {
+    const caseObjects = this.groupCase.objects;
+    switch (name) {
+      case '7대 중범죄':
+        this.applyNodePosition('crime7');
+        break;
+      case '범죄':
+        this.applyNodePosition('crime');
+        break;
+      case '지역':
+        this.applyNodePosition('state');
+        break;
+      case '-':
+
+        caseObjects.forEach((d, i) => {
+          const angle = Math.random() * Math.PI * 2;
+          const coord = this.getNodePositionInCell(0, 1, i, 500);
+          const r = Math.random();
+          d.position = {
+            x: coord.x,
+            y: coord.y
+          };
+        });
+        break;
+    }
+  }
   private mounted() {
     this.vl = new VIRE(this.$refs.renderer, true);
     this.vl.setBackgroundColor('#fff');
     this.vl.appendGridHelperWithRotate(10000, 100, '#ddd', '#eee', 90);
-    // this.vl.appendGridHelperWithRotate(10000, 100, '#ddd', '#eee');
-    // this.vl.appendGridHelperWithRotate(10000, 100, '#ccc', '#ddd', 0, 0, 90);
     this.vl.appendStats({
       position: 'absolute',
       left: 'auto',
@@ -95,17 +171,27 @@ export default class TsneViewer extends Vue {
 
     this.groupCase = this.vl.createGroup(PointGroup, cases.length);
     const caseObjects = this.groupCase.objects;
-
     caseObjects.forEach((d, i) => {
-      const angle = Math.random() * Math.PI * 2;
-      const r = Math.random();
-      d.position = {
-        x: Math.sin(angle) * this.displayOptions.distributionRadius * r,
-        y: Math.cos(angle) * this.displayOptions.distributionRadius * r,
-      };
-      d.scale = 3;
+      d.scale = 2;
       d.setColorHex('#039be5');
     });
+
+
+    const eg = this.vl.createElementGroup();
+
+    const txt = eg.addTextElement('asdfasdfasdf');
+    txt.style = {
+      left: `${this.vl.width / 2}px`,
+      top: `${this.vl.height / 2}px`,
+    };
+
+    // this.vl.removeElementGroup(eg.id);
+    this.changeCategorize('7대 중범죄');
+
+    return;
+
+    console.log(caseRawData);
+    return;
 
     console.warn('case human edge : ', caseHumanEdges.length);
     console.warn('cases edge : ', cases.length);

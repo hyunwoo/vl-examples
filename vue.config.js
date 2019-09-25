@@ -1,4 +1,5 @@
 module.exports = {
+
   devServer: {
     host: '0.0.0.0',
     disableHostCheck: true
@@ -6,7 +7,8 @@ module.exports = {
   configureWebpack: {
     resolve: {
       symlinks: false
-    }
+    },
+
   },
   chainWebpack: config => {
     config.module
@@ -22,5 +24,11 @@ module.exports = {
   runtimeCompiler: true,
   productionSourceMap: undefined,
   parallel: undefined,
-  css: undefined,
+  css: {
+    loaderOptions: {
+      less: {
+        javascriptEnabled: true
+      }
+    }
+  },
 };

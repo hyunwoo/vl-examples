@@ -16,6 +16,13 @@
         <v-icon>attachment</v-icon>
       </v-btn>
       <v-btn class="command"
+             :selected="ui.tab.activate === 'case-filter'"
+             @click="clickControlFieldCommand('case-filter')"
+             block
+             icon>
+        <v-icon>filter_list</v-icon>
+      </v-btn>
+      <v-btn class="command"
              :selected="ui.tab.activate === 'tsne'"
              @click="clickControlFieldCommand('tsne')"
              block
@@ -30,6 +37,51 @@
         <v-icon>timeline</v-icon>
       </v-btn>
 
+      <div class="t-sen-controller control-field"
+           :selected="ui.tab.activate ==='case-filter'">
+        <div class="pa-3">
+          <div class="px-2">
+            <b>사건 필터</b>
+          </div>
+          <div class="px-2 mb-2 caption">
+            사건을 필터링 하여 데이터 셋 선택
+          </div>
+          <div class="selector-header">Categorize</div>
+          <div class="px-2 ">
+            <v-select :items="['-','7대 중범죄','범죄','지역']"
+                      @change="changeCategorize"
+                      class="mt-0 pt-0"
+                      dense=""
+                      label=""></v-select>
+          </div>
+          <div class="selector-header">Colorize</div>
+          <div class="px-2">
+            <v-select :items="['-','7대 중범죄','범죄','지역']"
+                      class="mt-0 pt-0"
+                      dense=""
+                      label=""></v-select>
+          </div>
+        </div>
+        <div class="px-3"
+             style="font-size:12px; color:#666;">
+          <div class="desc">State : <b>{{ui.tsne.status}}</b></div>
+          <div>Iteration : {{ui.tsne.currentIteration}} </div>
+          <div>Error rate : {{ui.tsne.currentErrorRate}}</div>
+          <div>Gradient vector norm : {{ui.tsne.currentGVN}}</div>
+        </div>
+        <v-progress-linear class="mt-2"
+                           :active="ui.tsne.status !== 'READY'"
+                           :value="ui.tsne.currentIteration / ui.tsne.iteration * 100"></v-progress-linear>
+        <v-divider></v-divider>
+
+        <v-btn @click="startTSNE"
+               :disabled="ui.tsne.running"
+               :loading="ui.tsne.running"
+               block
+               tile
+               large=""
+               text>apply dataset</v-btn>
+      </div>
       <div class="t-sen-controller control-field"
            :selected="ui.tab.activate ==='tsne'">
         <div class="pa-3">
