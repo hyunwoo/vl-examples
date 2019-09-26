@@ -6,6 +6,7 @@ import VIRE from '@/vire';
 import { PointGroup } from '@/vire/group/point';
 
 import _ from 'lodash';
+import ColorConvert from 'color-convert';
 import raw from './data/case_edge.json';
 import TSNE from 'tsne-js';
 import caseEdges from './data/case_edge.json';
@@ -18,6 +19,8 @@ import { LineSegementGroup } from '@/vire/group/lineSegement';
 import Worker from 'worker-loader!./tsne.worker.ts';
 import { TSNEWorkerProps, TSNEWorkerData } from './index.js';
 import caseRawData from './data/generated/case.json';
+import ElementGroup from '@/vire/group/texts/textGroup.js';
+import ElementObject from '@/vire/group/texts/textObject.js';
 
 @Component({})
 export default class TsneViewer extends Vue {
@@ -28,6 +31,8 @@ export default class TsneViewer extends Vue {
   private groupCaseToHuman!: LineSegementGroup;
   private groupCaseToCase!: LineSegementGroup;
   private groupHumanToHuman!: LineSegementGroup;
+  private textElementGroup!: ElementGroup;
+  private textElementObjects!: ElementObject[];
   private edgeCaseToCase: any[] = [];
   private worker = new Worker();
   private displayOptions = {
@@ -87,20 +92,61 @@ export default class TsneViewer extends Vue {
       y: -nodeIndexY * nodeSize + -cy + height / 2,
     };
   }
+  /**
+   * text ElementObject를 위해 cellCenterPosition을 구하는 함수이다.
+   * @param cellIndex
+   * @param cellMaxCount
+   * @param nodeMaxCount
+   */
+  private makeCellCenterPosition(cellIndex: number, cellMaxCount: number, nodeMaxCount: number) {
+    const width = 400;
+    const height = 400;
+    const splitCount = Math.ceil(Math.sqrt(cellMaxCount));
+    const cx = width / splitCount / 2
+      + cellIndex % splitCount * width / splitCount;
+    const cy = height / splitCount / 2 + cellIndex
+      + Math.floor(cellIndex / splitCount) * height / splitCount;
+
+    return {
+      x: (cx - width / 2) + this.vl.width / 2,
+      y: (-cy + height / 2) + this.vl.height / 2
+    };
+  }
+
   private applyNodePosition(category: string) {
     const caseObjects = this.groupCase.objects;
     const groups = _.groupBy(caseRawData, d => d[category]);
+    console.warn('caseRawData', caseRawData);
     const groupLength = Object.keys(groups).length;
+
+    if (!_.isNil(this.textElementGroup)) {
+      _.forEach(this.textElementObjects, textElementObject => {
+        this.textElementGroup.removeElement(textElementObject);
+      });
+    }
+    this.textElementGroup = this.vl.createElementGroup();
+    this.textElementObjects = [];
+
     _(groups).map((v, k) => {
       return {
         name: k,
         items: v,
       };
     }).sortBy(group => -group.items.length).forEach((group, groupIndex) => {
+      // 텍스트 위치를 부여한다.
+      // const eg = this.vl.createElementGroup();
+      const cellCenterPosition = this.makeCellCenterPosition(groupIndex, groupLength, group.items.length);
+      console.log('cellCenterPosition', cellCenterPosition);
+      const txt = this.textElementGroup.addTextElement(group.name);
+      txt.style = {
+        left: `${cellCenterPosition.x}px`,
+        bottom: `${cellCenterPosition.y}px`,
+      };
+      this.textElementObjects.push(txt);
       // color group.name
       _.forEach(group.items, (item, itemIndex) => {
         const pos = this.getNodePositionInCell(groupIndex, groupLength, itemIndex, group.items.length);
-        console.log(pos);
+        // console.log(pos);
         const node = caseObjects[item.id - 1];
         node.position = {
           x: pos.x,
@@ -136,6 +182,61 @@ export default class TsneViewer extends Vue {
         break;
     }
   }
+  private changeColorByCategory(name: string) {
+    const caseObjects = this.groupCase.objects;
+    switch (name) {
+      case '7대 중범죄':
+        this.applyNodeColor('crime7');
+        break;
+      case '범죄':
+        this.applyNodeColor('crime');
+        break;
+      case '지역':
+        this.applyNodeColor('state');
+        break;
+      case '-':
+        this.applyNodeColor('-');
+        break;
+    }
+  }
+  private applyNodeColor(category: string) {
+    const caseObjects = this.groupCase.objects;
+
+    if (category !== '-') {
+    const groups = _.groupBy(caseRawData, d => d[category]);
+    // 색상 hash를 만든다.
+    const palette = this.makePalette(Object.keys(groups));
+
+    _(groups).map((v, k) => {
+      return {
+        name: k,
+        items: v,
+      };
+    }).sortBy(group => -group.items.length).forEach((group, groupIndex) => {
+      _.forEach(group.items, (item, itemIndex) => {
+        const node = caseObjects[item.id - 1];
+        node.setColorHex(palette[group.name]);
+      });
+    });
+  } else {
+    _.forEach(caseObjects, caseObject => {
+      caseObject.setColorHex('#039be5');
+    });
+  }
+  }
+
+  private makePalette(keyArray: string[]) {
+    const palette: {[key: string]: string} = {};
+    for (let i = 0; i < keyArray.length; i++) {
+      palette[keyArray[i]] = `#${ColorConvert.hsl.hex([
+        (360 / keyArray.length) * i,
+        50,
+        50
+      ])}`;
+    }
+    return palette;
+  }
+
   private mounted() {
     this.vl = new VIRE(this.$refs.renderer, true);
     this.vl.setBackgroundColor('#fff');
@@ -177,13 +278,12 @@ export default class TsneViewer extends Vue {
     });
 
 
-    const eg = this.vl.createElementGroup();
-
-    const txt = eg.addTextElement('asdfasdfasdf');
-    txt.style = {
-      left: `${this.vl.width / 2}px`,
-      top: `${this.vl.height / 2}px`,
-    };
+    // const eg = this.vl.createElementGroup();
+    // const txt = eg.addTextElement('asdfasdfasdf');
+    // txt.style = {
+    //   left: `${this.vl.width / 2}px`,
+    //   top: `${this.vl.height / 2}px`,
+    // };
 
     // this.vl.removeElementGroup(eg.id);
     this.changeCategorize('7대 중범죄');
