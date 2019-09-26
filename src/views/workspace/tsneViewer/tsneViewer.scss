@@ -13,6 +13,7 @@
     height: 100%;
   }
 }
+
 .controls {
   position: absolute;
   left: 0px;
@@ -26,31 +27,37 @@
   .command {
     background: #fff;
     transition: background-color 0.3s, color 0.3s;
+
     &[selected] {
       background: #555;
       color: #fff;
     }
+
     border-radius: 0 !important;
     height: 48px;
     width: 48px;
     border-bottom: solid 1px #eee;
   }
+
   .control-field {
     opacity: 0;
     left: 48px;
     pointer-events: none;
     transition: opacity 0.3s, left 0.3s;
     z-index: -1;
+
     &[selected] {
       opacity: 1;
       pointer-events: all;
       left: 64px;
     }
+
     width: 300px;
     border: solid 1px #ddd;
     background: #fff;
     position: absolute;
     top: 32px;
+
     .selector-header {
       font-size: 12px;
       padding: 8px 8px 0;
@@ -63,23 +70,37 @@
     }
   }
 }
+
 .legend {
   position: absolute;
-  left: 50px;
-  bottom: 30px;
+  left: 64px;
+  bottom: 16px;
   z-index: 5;
+  padding: 8px 12px 8px 8px;
   // height: 200px;
   background: #fff;
   border: solid 1px #ddd;
-  padding-right: 5px;
+
   // width: 100px;
   .legend-item {
     display: flex;
+
+
+    height: 20px;
+
     .legend-color {
-      width: 10px;
-      height: 10px;
-      margin: 5px 4px 0 4px;
+      margin: 3px 0;
+      width: 13px;
+      height: 13px;
       // background-color: blue;
+    }
+
+    .legend-label {
+      margin-top: 2px;
+      margin-left: 8px;
+      line-height: inherit;
+      font-size: 11px;
+      font-weight: 700;
     }
   }
 }

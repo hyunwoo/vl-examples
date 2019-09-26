@@ -53,6 +53,12 @@ export default class TsneViewer extends Vue {
   private nodeMaxDate!: Date;
   private edgeCaseToCase: any[] = [];
   private worker = new Worker();
+  private nodePositionNeedsUpdate: boolean = false;
+  private linkes: Array<{
+    from: number,
+    to: number,
+    weight: number,
+  }> = [];
   private displayOptions = {
     distributionRadius: 400
   };
@@ -60,9 +66,7 @@ export default class TsneViewer extends Vue {
     tab: {
       activate: ''
     },
-    human: {
-      weight: [0.0, 1.0]
-    },
+
     tsne: {
       perplexity: 15,
       earlyExaggeration: 2,
@@ -76,6 +80,11 @@ export default class TsneViewer extends Vue {
     },
     filter: {
       currentCategorize: 'crime7'
+    },
+    edges: {
+      enableEdges: false,
+      weight: [0.0, 1.0],
+      opacity: 0.1,
     }
   };
   private clickControlFieldCommand(key: string) {
@@ -221,6 +230,7 @@ export default class TsneViewer extends Vue {
       });
   }
   private changeCategorize(name) {
+    this.nodePositionNeedsUpdate = true;
     const caseObjects = this.groupCase.objects;
     switch (name) {
       case '7대 중범죄':
@@ -281,7 +291,7 @@ export default class TsneViewer extends Vue {
           nodeOpacity = this.makeNodeOpacity(new Date(d.date));
         }
         const node = caseObjects[d.id - 1];
-        node.setColorHex('#039be5', nodeOpacity);
+        node.setColorHex('#028ac5', nodeOpacity);
       });
     } else {
       caseRawData = _.sortBy(caseRawData, d => d[category]);
@@ -303,7 +313,9 @@ export default class TsneViewer extends Vue {
           });
         });
     }
-    this.applyNodePosition('crime7');
+    if (this.nodePositionNeedsUpdate) {
+      this.applyNodePosition(this.ui.filter.currentCategorize);
+    }
   }
 
   private makeNodeOpacity(date: Date): number {
@@ -443,26 +455,12 @@ export default class TsneViewer extends Vue {
     this.drawEdges();
   }
 
-  private drawEdges() {
-    const lines = this.groupCaseToCase.objects;
-    const caseObjects = this.groupCase.objects;
-    this.edgeCaseToCase.forEach((edge, i) => {
-      lines[i].position = {
-        0: caseObjects[edge.from].position,
-        1: caseObjects[edge.to].position
-      };
-      lines[i].color = {
-        0: {
-          r: 1,
-          g: 0.3,
-          b: 0,
-          a: 0.2
-        }
-      };
-    });
-  }
+
   private rendererUpdate() {
     // this.drawEdges();
+    if (this.linkes.length !== 0) {
+      this.updateEdges();
+    }
   }
 
   private updateEdgeHumanNode() {
@@ -550,6 +548,7 @@ export default class TsneViewer extends Vue {
     }
   }
   private startTSNE() {
+    this.nodePositionNeedsUpdate = false;
     this.ui.tsne.running = true;
     console.log('?');
     const d: TSNEWorkerData = {
@@ -564,5 +563,66 @@ export default class TsneViewer extends Vue {
       }
     };
     this.worker.postMessage(d);
+  }
+
+  private drawEdges() {
+
+    // @ts-ignore
+    const edges: number[][] = caseEdges;
+    this.linkes = [];
+    for (let i = 0; i < edges.length; i++) {
+      for (let j = i + 1; j < edges[i].length; j++) {
+        const w = edges[i][j];
+        if (w > this.ui.edges.weight[0] && w < this.ui.edges.weight[1]) {
+          this.linkes.push({
+            from: i,
+            to: j,
+            weight: w,
+          });
+
+        }
+
+      }
+    }
+
+
+    if (this.groupCaseToCase) {
+      this.vl.removeRenderGroup(this.groupCaseToCase);
+      // @ts-ignore
+      this.groupCaseToCase = null;
+    }
+    if (!this.ui.edges.enableEdges) {
+      return;
+    }
+
+    this.groupCaseToCase = this.vl.createGroup(LineSegementGroup, this.linkes.length);
+    // calc Edges
+    return;
+  }
+
+  private updateEdges() {
+    if (!this.groupCaseToCase) {
+      return;
+    }
+    const linkObjects = this.groupCaseToCase.objects;
+    const groupObjects = this.groupCase.objects;
+    this.linkes.forEach((link, index) => {
+      const from = groupObjects[link.from];
+      const to = groupObjects[link.to];
+      const currentLink = linkObjects[index];
+      currentLink.position = {
+        0: from.position,
+        1: to.position,
+      };
+      const cf = from.color;
+      cf.a = this.ui.edges.opacity;
+      const ct = to.color;
+      ct.a = this.ui.edges.opacity;
+
+      currentLink.setColor({
+        0: cf,
+        1: cf
+      });
+    });
   }
 }
