@@ -56,7 +56,7 @@
           </div>
           <div class="selector-header">Colorize</div>
           <div class="px-2">
-            <v-select :items="['-','7대 중범죄','범죄','지역']"
+            <v-select :items="['-','7대 중범죄','지역']"
                       @change="changeColorByCategory"
                       class="mt-0 pt-0"
                       dense=""
