@@ -49,15 +49,15 @@ export default class TsneViewer extends Vue {
   private textElementGroup!: ElementGroup;
   private textElementObjects!: ElementObject[];
   private palette: Palette = {};
-  private nodeMinDate!: Date;
-  private nodeMaxDate!: Date;
+  private nodesMinDate!: Date;
+  private nodesMaxDate!: Date;
   private edgeCaseToCase: any[] = [];
   private worker = new Worker();
   private nodePositionNeedsUpdate: boolean = false;
   private linkes: Array<{
-    from: number,
-    to: number,
-    weight: number,
+    from: number;
+    to: number;
+    weight: number;
   }> = [];
   private displayOptions = {
     distributionRadius: 400
@@ -84,7 +84,7 @@ export default class TsneViewer extends Vue {
     edges: {
       enableEdges: false,
       weight: [0.0, 1.0],
-      opacity: 0.1,
+      opacity: 0.1
     }
   };
   private clickControlFieldCommand(key: string) {
@@ -190,14 +190,12 @@ export default class TsneViewer extends Vue {
       .sortBy(group => -group.items.length)
       .forEach((group, groupIndex) => {
         // 텍스트 위치를 부여한다.
-        // const eg = this.vl.createElementGroup();
         const cellCenterPosition = this.makeCellCenterPosition(
           groupIndex,
           groupLength,
           1000,
           1000
         );
-        // console.log('cellCenterPosition', cellCenterPosition);
         const txt = this.textElementGroup.addTextElement(group.name);
         txt.style = {
           textAlign: 'center',
@@ -212,7 +210,7 @@ export default class TsneViewer extends Vue {
           top: `${cellCenterPosition.y + this.vl.height / 2 + 50}px`
         };
         this.textElementObjects.push(txt);
-        // color group.name
+
         _.forEach(group.items, (item, itemIndex) => {
           const pos = this.getNodePositionInCell(
             groupIndex,
@@ -220,7 +218,6 @@ export default class TsneViewer extends Vue {
             itemIndex,
             group.items.length
           );
-          // console.log(pos);
           const node = caseObjects[item.id - 1];
           node.position = {
             x: pos.x,
@@ -273,7 +270,6 @@ export default class TsneViewer extends Vue {
   }
   private applyNodeColor(category: string) {
     const caseObjects = this.groupCase.objects;
-    // caseRawData = _.sortBy(caseRawData, d => d[category]);
 
     if (category === '-') {
       this.palette = {};
@@ -281,6 +277,12 @@ export default class TsneViewer extends Vue {
         caseObject.setColorHex('#039be5');
       });
     } else if (category === 'date') {
+      const basicNodeHexColor: string = '#028ac5';
+      this.palette = this.makePaletteForDate({
+        basicNodeHexColor,
+        nodesMaxDate: this.nodesMaxDate,
+        nodesMinDate: this.nodesMinDate
+      });
       caseRawData = _.sortBy(
         caseRawData,
         d => -new Date(d[category] as string).getTime()
@@ -288,15 +290,19 @@ export default class TsneViewer extends Vue {
       _.forEach(caseRawData, d => {
         let nodeOpacity: number = 0.1;
         if (!_.isNil(d.date)) {
-          nodeOpacity = this.makeNodeOpacity(new Date(d.date));
+          nodeOpacity = this.makeNodeOpacity({
+            nodeDate: new Date(d.date),
+            nodesMaxDate: this.nodesMaxDate,
+            nodesMinDate: this.nodesMinDate
+          });
         }
         const node = caseObjects[d.id - 1];
-        node.setColorHex('#028ac5', nodeOpacity);
+        node.setColorHex(basicNodeHexColor, nodeOpacity);
       });
     } else {
       caseRawData = _.sortBy(caseRawData, d => d[category]);
       const groups = _.groupBy(caseRawData, d => d[category]);
-      this.palette = this.makePalette(Object.keys(groups));
+      this.palette = this.makePaletteByKeyArray(Object.keys(groups));
 
       _(groups)
         .map((v, k) => {
@@ -313,46 +319,73 @@ export default class TsneViewer extends Vue {
           });
         });
     }
+
     if (this.nodePositionNeedsUpdate) {
       this.applyNodePosition(this.ui.filter.currentCategorize);
     }
   }
 
-  private makeNodeOpacity(date: Date): number {
-    const maxGap: number =
-      this.nodeMaxDate.getTime() - this.nodeMinDate.getTime();
+  /**
+   * node의 date로 node opacity값을 반환하는 함수이다.
+   * @param nodeDate : node의 날짜
+   */
+  private makeNodeOpacity(o: {
+    nodeDate: Date;
+    nodesMaxDate: Date;
+    nodesMinDate: Date;
+  }): number {
+    const maxGap: number = o.nodesMaxDate.getTime() - o.nodesMinDate.getTime();
 
-    return ((date.getTime() - this.nodeMinDate.getTime()) / maxGap) * 0.9 + 0.1;
+    return (
+      ((o.nodeDate.getTime() - o.nodesMinDate.getTime()) / maxGap) * 0.9 + 0.1
+    );
   }
 
   /**
    * 색상을 보관하는 object(hash)를 만드는 함수이다.
    * @param keyArray
    */
-  private makePalette(keyArray: string[]) {
-    const palette: { [key: string]: string } = {};
+  private makePaletteByKeyArray(keyArray: string[]) {
+    const palette: Palette = {};
     for (let i = 0; i < keyArray.length; i++) {
       palette[keyArray[i]] = `#${ColorConvert.hsl.hex([
         (360 / keyArray.length) * i,
         50,
         50
       ])}`;
-      // palette[keyArray[i]] = {
-      //   h: 1,
-      //   s: 1,
-      //   l: 1,
-      //   a: 1
-      // };
     }
     return palette;
   }
 
+  /**
+   * 범례에 만드는 date용 palette를 만드는 함수이다.
+   * @param o.basicNodeHexColor : node의 hex color
+   */
+  private makePaletteForDate(o: {
+    basicNodeHexColor: string;
+    nodesMaxDate: Date;
+    nodesMinDate: Date;
+  }) {
+    const palette: Palette = {};
+    const rgb = ColorConvert.hex.rgb(o.basicNodeHexColor);
+    palette[
+      o.nodesMaxDate.toDateString()
+    ] = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 1)`;
+    palette[
+      o.nodesMinDate.toDateString()
+    ] = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.1)`;
+    return palette;
+  }
+
+  /**
+   * 최저 최근 date를 찾아서 반환해주는 함수이다.
+   * @param caseRawData1 : caseRawData
+   */
   private makeNodeMinMaxDate(caseRawData1: any) {
     const sortedCaseRawData = _(caseRawData1)
       .filter(caseDatum => caseDatum.date !== null)
       .sortBy(caseDatum => new Date(caseDatum.date).getTime())
       .value();
-    console.log('sortedCaseRawData', sortedCaseRawData);
 
     return {
       min: new Date(sortedCaseRawData[0].date),
@@ -400,64 +433,15 @@ export default class TsneViewer extends Vue {
     });
 
     const minMaxDate = this.makeNodeMinMaxDate(caseRawData);
-    this.nodeMinDate = minMaxDate.min;
-    this.nodeMaxDate = minMaxDate.max;
-    console.log('nodeMinDate', this.nodeMinDate);
-    console.log('this.nodeMaxDate', this.nodeMaxDate);
+    this.nodesMinDate = minMaxDate.min;
+    this.nodesMaxDate = minMaxDate.max;
 
     this.changeCategorize('7대 중범죄');
 
     return;
-
-    console.log(caseRawData);
-    return;
-
-    console.warn('case human edge : ', caseHumanEdges.length);
-    console.warn('cases edge : ', cases.length);
-    console.warn('human edge : ', humans.length);
-
-    // console.log(humans.length);
-    // return;
-    // setTimeout(this.createHumanGroup, 3000);
-    // this.createHumanGroup();
-
-    return;
-    this.groupHuman = this.vl.createGroup(PointGroup, 1295);
-    const humanObjects = this.groupHuman.objects;
-    humans.forEach((d, i) => {
-      humanObjects[i].position = {
-        x: (d[0] * this.vl.height) / 2,
-        y: (d[1] * this.vl.height) / 2
-        // z: d[2] * this.vl.height / 2,
-      };
-      humanObjects[i].scale = 1;
-      humanObjects[i].setColorHex('#039be5');
-    });
-    // this.vl.removeRenderGroup(this.groupHuman);
-    const arr = caseEdges as any[];
-
-    for (let i = 0; i < arr.length; i++) {
-      for (let j = i + 1; j < arr.length; j++) {
-        if (arr[i][j] > 0.9) {
-          this.edgeCaseToCase.push({
-            from: i,
-            to: j,
-            weight: arr[i][j]
-          });
-        }
-      }
-    }
-
-    this.groupCaseToCase = this.vl.createGroup(
-      LineSegementGroup,
-      this.edgeCaseToCase.length
-    );
-    this.drawEdges();
   }
 
-
   private rendererUpdate() {
-    // this.drawEdges();
     if (this.linkes.length !== 0) {
       this.updateEdges();
     }
@@ -529,10 +513,6 @@ export default class TsneViewer extends Vue {
       obj.scale = 2;
       obj.setColorHex('#f00');
     });
-
-    // objs.forEach((o, i )=>{
-    //   o.po
-    // })
   }
 
   // CASES 분석
@@ -550,7 +530,13 @@ export default class TsneViewer extends Vue {
   private startTSNE() {
     this.nodePositionNeedsUpdate = false;
     this.ui.tsne.running = true;
-    console.log('?');
+
+    if (!_.isNil(this.textElementGroup)) {
+      this.vl.removeElementGroup(this.textElementGroup);
+      // @ts-ignore
+      this.textElementGroup = null;
+    }
+
     const d: TSNEWorkerData = {
       action: 'generate',
       // @ts-ignore
@@ -566,7 +552,6 @@ export default class TsneViewer extends Vue {
   }
 
   private drawEdges() {
-
     // @ts-ignore
     const edges: number[][] = caseEdges;
     this.linkes = [];
@@ -577,14 +562,11 @@ export default class TsneViewer extends Vue {
           this.linkes.push({
             from: i,
             to: j,
-            weight: w,
+            weight: w
           });
-
         }
-
       }
     }
-
 
     if (this.groupCaseToCase) {
       this.vl.removeRenderGroup(this.groupCaseToCase);
@@ -595,8 +577,10 @@ export default class TsneViewer extends Vue {
       return;
     }
 
-    this.groupCaseToCase = this.vl.createGroup(LineSegementGroup, this.linkes.length);
-    // calc Edges
+    this.groupCaseToCase = this.vl.createGroup(
+      LineSegementGroup,
+      this.linkes.length
+    );
     return;
   }
 
@@ -612,7 +596,7 @@ export default class TsneViewer extends Vue {
       const currentLink = linkObjects[index];
       currentLink.position = {
         0: from.position,
-        1: to.position,
+        1: to.position
       };
       const cf = from.color;
       cf.a = this.ui.edges.opacity;
