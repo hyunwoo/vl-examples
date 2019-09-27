@@ -24,7 +24,7 @@ import ElementObject from '@/vire/group/texts/textObject.js';
 
 let caseRawData = _.cloneDeep(caseRawFile);
 const multiCount = 0;
-const nodeSize = 10;
+const nodeSize = 9;
 for (let j = 0; j < multiCount; j++) {
   for (let i = 0; i < 500; i++) {
     const copied = _.cloneDeep(caseRawFile[i]);
