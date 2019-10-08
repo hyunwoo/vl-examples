@@ -7,7 +7,8 @@
                fill-height>
     <v-layout light>
       <v-flex class="examples-list-container">
-        <v-btn text
+        <v-btn dark
+               text
                tile
                block
                to="/"
@@ -24,7 +25,8 @@
             <v-icon slot="append">search</v-icon>
           </v-text-field>
         </div>
-        <v-list shaped>
+        <v-list shaped
+                dark>
           <v-list-item-group>
             <transition-group name="fade">
               <template v-for="(item, i) in displayItems">

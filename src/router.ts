@@ -24,6 +24,14 @@ export default new Router({
       component: () => import('@/views/examples')
     },
     {
+      path: '/examples/math/transform',
+      name: 'examples-math-01',
+      component: () =>
+        import(
+          /* webpackChunkName: "example-line" */ '@/views/examples/math/transform'
+        )
+    },
+    {
       path: '/examples/line/radial-light',
       name: 'examples-line-01',
       component: () =>
@@ -98,13 +106,30 @@ export default new Router({
     },
 
     {
-      path: '/workspace/tsne-viewer',
-      name: 'tsne-viewer',
+      path: '/examples/sample/smoke-text',
+      name: 'effect-points-smoke',
       component: () =>
         import(
-          /* webpackChunkName: "workspace-tsne" */ '@/views/workspace/tsneViewer'
+          /* webpackChunkName: "example-sample" */ '@/views/examples/sample/smoke'
         )
-    }
+    },
+    {
+      path: '/examples/sample/morper',
+      name: 'effect-morper',
+      component: () =>
+        import(
+          /* webpackChunkName: "example-sample" */ '@/views/examples/sample/morpher'
+        )
+    },
+    {
+      path: '/examples/sample/multi-network',
+      name: 'visualization-multi-network',
+      component: () =>
+        import(
+          /* webpackChunkName: "example-sample" */ '@/views/examples/sample/multiNetwork'
+        )
+    },
+
     // {
     //   path: '/about',
     //   name: 'about',

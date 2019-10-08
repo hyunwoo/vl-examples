@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import LineSegementGroup from '@/vire/group/lineSegement/lineSegementGroup';
 import { ThreeDimensionValue } from '@/vire/dimensionValues';
 import { Font, BooleanKeyframeTrack } from 'three';
+import { SmokeText } from '@/vire/group/smoke';
 
 
 interface Movement {
@@ -25,7 +26,7 @@ interface NodeLinker {
 @Component({})
 export default class Main extends Vue {
   public $refs!: { renderer: HTMLElement };
-  private vl!: VIRE;
+  private vire!: VIRE;
   private pointGroup!: PointGroup;
   private lineGroup!: LineSegementGroup;
   private pointCount: number = 60;
@@ -33,11 +34,10 @@ export default class Main extends Vue {
   private nodeLinker: NodeLinker[] = [];
   private lineCount!: number;
   private moveStatus: number = 0;
+  private smokeText!: SmokeText;
 
   private mounted() {
-    this.vl = new VIRE(this.$refs.renderer);
-
-
+    this.vire = new VIRE(this.$refs.renderer);
 
     for (let i = 0; i < this.pointCount; i++) {
       const dir = new THREE.Vector3(Math.random() * 2 - 1,
@@ -52,8 +52,8 @@ export default class Main extends Vue {
         velocity: (Math.random() * 50 + 15)
       });
     }
-    this.vl.setBackgroundColor(0, 0, 0);
-    this.pointGroup = this.vl.createGroup(PointGroup, this.pointCount);
+    this.vire.setBackgroundColor(0, 0, 0);
+    this.pointGroup = this.vire.createGroup(PointGroup, this.pointCount);
 
     for (let i = 0; i < this.pointCount; i++) {
       for (let j = i; j < this.pointCount; j++) {
@@ -65,7 +65,7 @@ export default class Main extends Vue {
       }
     }
     this.lineCount = this.nodeLinker.length;
-    this.lineGroup = this.vl.createGroup(LineSegementGroup, this.lineCount);
+    this.lineGroup = this.vire.createGroup(LineSegementGroup, this.lineCount);
 
     console.log(this.lineCount, this.pointCount);
     this.alignTwist(0);
@@ -90,9 +90,12 @@ export default class Main extends Vue {
       };
     });
 
+    // this.smokeText = new SmokeText(this.vire, { maxParticleCount: 20000, canvasWidth: 1200, canvasHeight: 500 });
+    // this.smokeText.addText('VIRE', 100, 400,
+    //   { font: '800 100px Roboto', fillStyle: '#fff' });
+    // this.smokeText.play(8);
 
-
-    this.vl.onUpdate = this.onUpdate;
+    this.vire.onUpdate = this.onUpdate;
   }
 
   private onUpdate(time: number, deltaTime: number) {
@@ -124,7 +127,7 @@ export default class Main extends Vue {
           (fromPos.z - toPos.z) * (fromPos.z - toPos.z));
 
 
-      const a = Math.min(Math.max((this.vl.height / 3 - dist) * 0.01, 0) * 0.5, 1);
+      const a = Math.min(Math.max((this.vire.height / 3 - dist) * 0.01, 0) * 0.5, 1);
 
       object.position = {
         0: fromPos,
@@ -133,13 +136,13 @@ export default class Main extends Vue {
 
       object.colorHSL = {
         0: {
-          h: fromPos.x / this.vl.width * 0.2 + 0.8 + time * 0.03,
+          h: fromPos.x / this.vire.width * 0.2 + 0.8 + time * 0.03,
           s: 0.9 * a,
           l: 0.6,
           a,
         },
         1: {
-          h: toPos.x / this.vl.width * 0.2 + 0.72 + time * 0.03,
+          h: toPos.x / this.vire.width * 0.2 + 0.72 + time * 0.03,
           s: 0.9 * a,
           l: 0.6,
           a
@@ -155,7 +158,7 @@ export default class Main extends Vue {
       const y = Math.sin(index * 0.1 + t) * 70;
       object.position = {
 
-        x: -this.vl.width / 2 + this.vl.width / (halfCount - 3) * (index % halfCount),
+        x: -this.vire.width / 2 + this.vire.width / (halfCount - 3) * (index % halfCount),
         y: index < halfCount ? -100 - y : 100 - y,
         z: 0,
 
@@ -173,13 +176,13 @@ export default class Main extends Vue {
   }
   private alignRectangle(t: number) {
     const sqrtCount = Math.floor(Math.sqrt(this.pointCount));
-    const gridX = this.vl.width / sqrtCount + 10;
+    const gridX = this.vire.width / sqrtCount + 10;
     this.pointGroup.objects.forEach((object, index) => {
 
       object.position = {
 
-        x: index % sqrtCount * gridX - this.vl.width / 2 + Math.sin(t + index * 0.1) * 10,
-        y: Math.floor(index / sqrtCount) * gridX - this.vl.height / 2 + Math.sin(t + index * 0.1) * 10,
+        x: index % sqrtCount * gridX - this.vire.width / 2 + Math.sin(t + index * 0.1) * 10,
+        y: Math.floor(index / sqrtCount) * gridX - this.vire.height / 2 + Math.sin(t + index * 0.1) * 10,
         z: 0,
 
       };
@@ -200,7 +203,7 @@ export default class Main extends Vue {
     const stepInner = Math.floor(this.pointGroup.objects.length / stepCount);
     this.pointGroup.objects.forEach((object, index) => {
       const angle = index * stepCount / this.pointCount * Math.PI * 2;
-      const r = this.vl.height * index / stepInner / 3 +
+      const r = this.vire.height * index / stepInner / 3 +
         index % 2 * 40 + Math.sin(t + index * 0.13) * 60;
 
       object.position = {
@@ -228,7 +231,7 @@ export default class Main extends Vue {
     this.pointGroup.objects.forEach((object, index) => {
       const angle = index * stepCount / this.pointCount * Math.PI * 2;
       const stepIndex = Math.floor(index / stepInner);
-      const r = this.vl.height / 3 * Math.floor(index / stepInner) / 5 + index % 2 * 40
+      const r = this.vire.height / 3 * Math.floor(index / stepInner) / 5 + index % 2 * 40
         + Math.sin(t + stepIndex * 0.2) * 40 + 120;
       object.position = {
 
@@ -254,7 +257,7 @@ export default class Main extends Vue {
     this.pointGroup.objects.forEach((object, index) => {
       const angle = index / this.pointCount * Math.PI * 2;
       const multiply = index % 2 === 0 ? -1 : 1;
-      const r = this.vl.height / 3 + multiply * 30 +
+      const r = this.vire.height / 3 + multiply * 30 +
         Math.sin(t + Math.PI * 2 * index / length * 2) * multiply * 20;
       object.position = {
 
@@ -275,6 +278,6 @@ export default class Main extends Vue {
     });
   }
   private destroyed() {
-    this.vl.release();
+    this.vire.release();
   }
 }
